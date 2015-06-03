@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The Titanic tragedy</title>
+  <script src="http://www.jasondavies.com/d3.min.js?3.0.0+slice-dice"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+
+      rect {
+        stroke: #000;
+      }
+
+      svg {
+        shape-rendering: crispEdges;
+      }
+
+      .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+      }
+
+      div.pclass_buttons {
+        position: fixed;
+        top: 50px;
+        left: 1070px;
+        max-width:50%;
+        min-width:800px;
+        max-height:500px;
+        min-height:21%;
+      }
+
+      div.pclass_buttons div {
+        background-color: rgb(251, 201, 127);
+        padding: 3px;
+        margin: 7px;
+        display: inline-block;
+      }
+    </style>
+    <script>
+      function format_data(data, pclass) {
+        var nested = data;
+        if (pclass !== null) {
+          nested = data.filter(function(d) {
+            return d.Pclass === pclass;
+          });
+        }
+
+        var males_survived = 0;
+        var males_perished = 0;
+        var females_survived = 0;
+        var females_perished = 0;
+
+        nested.forEach(function(d) {
+          if (d['Sex'] === 'male' && d['Survived'] === '1')
+            males_survived++;
+          else if (d['Sex'] === 'male' && d['Survived'] === '0')
+            males_perished++;
+          else if (d['Sex'] === 'female' && d['Survived'] === '1')
+            females_survived++;
+          else
+            females_perished++;
+        });
+
+        return [
+          { 'sex': 'male', 'state': 'survived', 'value': males_survived },
+          { 'sex': 'male', 'state': 'perished', 'value': males_perished },
+          { 'sex': 'female', 'state': 'survived', 'value': females_survived },
+          { 'sex': 'female', 'state': 'perished', 'value': females_perished }
+        ];
+      }
+
+      function draw(data) {
+        var width = 960,
+        height = 550,
+        margin = 60,
+        color = d3.scale.category10(),
+        n = d3.format(",d"),
+        p = d3.format("%");
+
+        all_pclasses = format_data(data, null);
+
+        var nest = d3.nest()
+        .key(function(d) { return d.sex; })
+        .key(function(d) { return d.state; });
+
+        var treemap = d3.layout.treemap()
+        .mode("slice-dice")
+        .size([width - 3 * margin, height - 2 * margin])
+        .children(function(d) { return d.values; })
+        .sort(null);
+
+        var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + margin + "," + margin + ")")
+        .datum({values: nest.entries(all_pclasses)})
+        .call(chart);
+
+        svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + treemap.size()[1] + ")")
+        .call(d3.svg.axis().scale(d3.scale.linear().range([0, treemap.size()[0]])).tickFormat(d3.format("%")));
+
+        svg.append("g")
+        .attr("class", "y axis")
+        .call(d3.svg.axis().scale(d3.scale.linear().range([treemap.size()[1], 0])).tickFormat(d3.format("%")).orient("left"));
+
+
+        svg.append("text")
+          .attr("x", width / 2.0 - 150)
+          .attr("y", height - margin)
+          .attr("font-size", "20px")
+          .text("Female | Male")
+
+
+
+
+        var pclasses = ['1', '2', '3', 'None'];
+
+        var buttons = d3.select("body")
+          .append("div")
+          .attr("class", "pclass_buttons")
+          .text("Passenger Class:")     
+          .selectAll("div")
+          .data(pclasses)
+          .enter()
+          .append("div")
+          .text(function(d) {
+              return d;
+          });
+          
+
+        buttons.on("click", function(pclass) {
+          if (pclass == "None")
+            transition(all_pclasses);
+          else
+            transition(format_data(data, pclass));
+        });
+
+        // set the stage for the legend with SVG elements
+        var legend = svg.append("g")
+          .attr("class", "legend")
+          .attr("transform", "translate(" + (width - 150) + "," + 20 + ")")
+          .selectAll("g")
+          .data(["Survived", "Perished"])
+          .enter().append("g");
+
+        var rect_width = 10;
+        var rect_height = 10;
+
+        legend.append("rect")
+            .attr("y", function(d, i) {
+                return i * 30;
+            })
+            .attr("width", function(d) {
+                return rect_width;
+            })
+            .attr("height", function(d) {
+                return rect_height;
+            })
+            .attr("fill", function(d) {
+                if (d == "Survived") {
+                    return color('survived');
+                } else {
+                    return color('perished');
+                }
+            });
+
+      legend.append("text")
+          .attr("y", function(d, i) {
+              return i * 30 + 10;
+          })
+          .attr("x", rect_width * 2)
+          .text(function(d) {
+              return d;
+          });
+
+        function chart(selection) {
+          selection.each(function() {
+            var cell = d3.select(this).selectAll("g.cell")
+            .data(treemap.nodes, function(d) {
+              return d.sex + " : " + d.state;
+            });
+            var cellEnter = cell.enter().append("g")
+            .attr("class", "cell");
+            var cellUpdate = d3.transition(cell)
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+            d3.transition(cell.exit()).remove();
+
+            cellEnter.filter(function(d) { return d.depth > 2; }).append("rect")
+            .style("fill", function(d) { return d.children ? null : color(d.state); });
+            cellUpdate.select("rect")
+            .attr("width", function(d) { return d.dx; })
+            .attr("height", function(d) { return d.dy; });
+
+
+            cellEnter.append("title");
+            cellUpdate.select("title")
+              .text(function(d) {
+                return d.children ? null : title(d);
+              });
+          
+          });
+        }
+
+        function title(d) {
+          return d.sex + ": " + d.parent.key + ": " + n(d.value);
+        }
+
+        function transition(data) {
+          svg.datum({values: nest.entries(data)})
+          .transition()
+          .duration(1000)
+          .call(chart);
+        }
+      }
+    </script>
+  </head>
+<body>
+  <script type="text/javascript">
+    d3.csv('titanic.csv', draw);
+  </script>
+  <h1>
+    The titanic tragedy: Who had better chances of survival ?
+  </h1>
+</body>
+</html>
