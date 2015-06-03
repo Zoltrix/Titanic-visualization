@@ -31,13 +31,21 @@
         min-width:800px;
         max-height:500px;
         min-height:21%;
+        font-size: 20px;
       }
 
       div.pclass_buttons div {
         background-color: rgb(251, 201, 127);
-        padding: 3px;
+        padding: 7px;
         margin: 7px;
         display: inline-block;
+        outline: 2px solid black;
+        cursor: pointer;
+      }
+
+      div.pclass_buttons text {
+        font: sans-serif;
+        font-size: 12px;
       }
     </style>
     <script>
@@ -136,6 +144,20 @@
           
 
         buttons.on("click", function(pclass) {
+
+          d3.select(".pclass_buttons")
+            .selectAll("div")
+            .transition()
+            .duration(500)
+            .style("color", "black")
+            .style("background", "rgb(251, 201, 127)");
+
+          d3.select(this)
+            .transition()
+            .duration(500)
+            .style("background", "lightBlue")
+            .style("color", "white");
+
           if (pclass == "None")
             transition(all_pclasses);
           else
@@ -150,8 +172,8 @@
           .data(["Survived", "Perished"])
           .enter().append("g");
 
-        var rect_width = 10;
-        var rect_height = 10;
+        var rect_width = 11;
+        var rect_height = 11;
 
         legend.append("rect")
             .attr("y", function(d, i) {
@@ -178,7 +200,8 @@
           .attr("x", rect_width * 2)
           .text(function(d) {
               return d;
-          });
+          })
+          .attr("font-size", "17px");
 
         function chart(selection) {
           selection.each(function() {
