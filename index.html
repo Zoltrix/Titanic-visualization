@@ -177,7 +177,7 @@
         // two moving axis for males and femals
         var sex_axis = svg.append("g")
           .attr("class", "sex_axis")
-          .attr("transform", "translate(0,-470)");  // tranform to the top of the page for better readability
+          .attr("transform", "translate(0,0)");  // tranform to the top of the page for better readability
 
 
         // add the first moving axis for females
@@ -194,7 +194,7 @@
         sex_axis.append("text")
           .attr("id", "female_text")
           .attr("x", x_scale(females_percentage) / 2.0 - 50)
-          .attr("y", 450)
+          .attr("y", (treemap.size()[1] + 60))
           .attr("font-size", "20px")
           .text("Female: " + p(females_percentage));
 
@@ -212,7 +212,7 @@
         sex_axis.append("text")
           .attr("id", "male_text")
           .attr("x", male_text_midpoint - 50)
-          .attr("y", 450)
+          .attr("y", (treemap.size()[1] + 60))
           .attr("font-size", "20px")
           .text("Male: " + p(males_percentage));
 
