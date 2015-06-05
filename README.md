@@ -31,7 +31,7 @@ Also, in the chart it was not clear at first which part represented males and wh
 - [Jason Davie's] Example
 
 
-[View]:http://bl.ocks.org/Zoltrix/c4cefeeeb0691a2fe407
+[View]: http://bl.ocks.org/Zoltrix/c4cefeeeb0691a2fe407
 [marimekko chart]: https://www.jasondavies.com/mekko/
 [Mike Bostock's]: http://bl.ocks.org/mbostock/1005090
 [Jason Davie's]: https://www.jasondavies.com/mekko/
