@@ -1,5 +1,9 @@
 # Titanic visualization
-A visualization of the titanic tragedy using d3.js -- [View] (click open in a new window to view the whole chart)
+A visualization of the titanic tragedy using d3.js -- [view on bl.ocks.org]
+
+Open the chart in a new window -- [Full View]
+
+
 
 ## Summary
 This visualization tries to explain what factors played the most vital part of determining who survived and who perished in the titanic trajedy. These factors are mostly *Sex* and *Passenger Class*.
@@ -31,7 +35,8 @@ Also, in the chart it was not clear at first which part represented males and wh
 - [Jason Davie's] Example
 
 
-[View]: http://bl.ocks.org/Zoltrix/c4cefeeeb0691a2fe407
+[Full View]: http://bl.ocks.org/Zoltrix/raw/c4cefeeeb0691a2fe407/
+[view on bl.ocks.org]: http://bl.ocks.org/Zoltrix/c4cefeeeb0691a2fe407
 [marimekko chart]: https://www.jasondavies.com/mekko/
 [Mike Bostock's]: http://bl.ocks.org/mbostock/1005090
 [Jason Davie's]: https://www.jasondavies.com/mekko/
