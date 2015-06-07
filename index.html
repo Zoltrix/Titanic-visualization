@@ -69,28 +69,17 @@
           });
         }
 
-        // counts of each group
-        var males_survived = 0;
-        var males_perished = 0;
-        var females_survived = 0;
-        var females_perished = 0;
-
-        nested.forEach(function(d) {
-          if (d['Sex'] === 'male' && d['Survived'] === '1')
-            males_survived++;
-          else if (d['Sex'] === 'male' && d['Survived'] === '0')
-            males_perished++;
-          else if (d['Sex'] === 'female' && d['Survived'] === '1')
-            females_survived++;
-          else
-            females_perished++;
-        });
+        var group_counts = d3.nest()
+          .key(function(d) { return d.Sex; })
+          .key(function(d) { return d.Survived; })
+          .rollup(function(v) { return v.length; })
+          .map(nested);
 
         return [
-          { 'sex': 'male', 'state': 'survived', 'value': males_survived },
-          { 'sex': 'male', 'state': 'perished', 'value': males_perished },
-          { 'sex': 'female', 'state': 'survived', 'value': females_survived },
-          { 'sex': 'female', 'state': 'perished', 'value': females_perished }
+          { 'sex': 'male', 'state': 'survived', 'value': group_counts.male["1"] },
+          { 'sex': 'male', 'state': 'perished', 'value': group_counts.male["0"] },
+          { 'sex': 'female', 'state': 'survived', 'value': group_counts.female["1"] },
+          { 'sex': 'female', 'state': 'perished', 'value': group_counts.female["0"] }
         ];
       }
 
